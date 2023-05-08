@@ -9,12 +9,13 @@ To get a local copy up and running follow these simple example steps.
 
 ### Installation
 
-1. Clone the repository from GitHub using `git clone <repository-url>`.
-2. Navigate to the project directory using `cd <project-directory>`.
-3. Create a virtual environment using `python -m venv env` command.
-4. Activate the virtual environment using `source env/bin/activate` command.
-5. Install the dependencies using `pip install -r requirements.txt` command.
-6. Run the migrations using `python manage.py migrate` command.
+1. Create project directory using `mkadir productmanager`.
+2. Navigate to the project directory using `cd productmanager`.
+3. Clone the repository from GitHub using `git clone https://github.com/melygonzalez/productmanager.git`.
+4. Create a virtual environment using `python -m venv env` command.
+5. Activate the virtual environment using `source env/bin/activate` command.
+6. Install the dependencies using `pip install -r requirements.txt` command.
+7. Run the migrations using `python manage.py migrate` command.
 
 ### Usage
 
