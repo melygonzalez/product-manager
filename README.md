@@ -1,4 +1,5 @@
-#Product Manager with DRF
+# Product Manager with DRF
+
 This is a Product Manager app built using Django Rest Framework. The app allows users to create, update, delete, and view products based on permissions. This app use JWT for authentication.
 
 ## Getting Started
@@ -6,7 +7,8 @@ This is a Product Manager app built using Django Rest Framework. The app allows 
 Follow this instructions to setting up your project locally.
 To get a local copy up and running follow these simple example steps.
 
-###Installation
+### Installation
+
 1. Clone the repository from GitHub using `git clone <repository-url>`.
 2. Navigate to the project directory using `cd <project-directory>`.
 3. Create a virtual environment using `python -m venv env` command.
@@ -14,13 +16,15 @@ To get a local copy up and running follow these simple example steps.
 5. Install the dependencies using `pip install -r requirements.txt` command.
 6. Run the migrations using `python manage.py migrate` command.
 
-#Usage
+### Usage
+
 To start the app, run python manage.py runserver command. This will start the development server at http://localhost:8000/.
 
-#Authentication
+### Authentication
+
 The app uses token-based authentication. To obtain an access token, send a `POST` request to the `/api/token` endpoint with a valid username and password. The response will contain an access token which can be used to authenticate subsequent requests.
 
-#API endpoints:
+### API endpoints:
 
 1. `POST /api/token/`
 - Create access token. ***Anyone can access***
@@ -42,6 +46,7 @@ The app uses token-based authentication. To obtain an access token, send a `POST
 - Delete a product by id. ***All approved users can access***
 
 
-#Testing
+### Testing
+
 Postman collection for the project are available in folder `productmanager`, ready to import and use.
 
