@@ -1,5 +1,4 @@
-from rest_framework import status
-from rest_framework.decorators import api_view, permission_classes
+from rest_framework import status, viewsets, filters
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 
@@ -7,63 +6,71 @@ from products.models import Product
 from products.serializers import ProductSerializer, StaffProductSerializer
 
 
-@api_view(['GET', 'POST'])
-@permission_classes([AllowAny])
-def product_list(request):
-    """
-    List all products, or create a new product.
-    """
-    if request.method == 'GET':
-        product_name = request.query_params.get('name')
-        product_status = request.query_params.get('status')
-        products = Product.objects.all()
-        if product_name:
-            products = products.filter(name=product_name)
-        if product_status:
-            products = products.filter(status=product_status)
-        if request.user.is_authenticated:
-            product_category = request.query_params.get('category')
-            if product_category:
-                products = products.filter(categories__name=product_category)
-            serializer = StaffProductSerializer(products, context={'request': request}, many=True)
-            return Response(serializer.data)
-        serializer = ProductSerializer(products, context={'request': request}, many=True)
-        return Response(serializer.data)
-    elif request.method == 'POST':
+class ProductViewSet(viewsets.ModelViewSet):
+    queryset = Product.objects.all()
+    filter_backends = [filters.SearchFilter]
+    search_fields = ['name', 'status', 'category']
+
+    def get_permissions(self):
+        if self.action == 'list':
+            return [AllowAny()]
+        return super().get_permissions()
+
+    def get_serializer_class(self):
+        if self.request.user.is_staff or self.request.user.is_superuser:
+            return StaffProductSerializer
+        else:
+            return ProductSerializer
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        name = self.request.query_params.get('name', None)
+        if name is not None:
+            queryset = queryset.filter(name=name)
+        status = self.request.query_params.get('status', None)
+        if status is not None:
+            queryset = queryset.filter(status=status)
+        if self.request.user.is_staff or self.request.user.is_superuser:
+            category = self.request.query_params.get('category', None)
+            if category is not None:
+                queryset = queryset.filter(categories__name=category)
+        return queryset
+
+    def create(self, request, *args, **kwargs):
         if request.user.is_staff or request.user.is_superuser:
             serializer = StaffProductSerializer(data=request.data)
             if serializer.is_valid():
                 serializer.save()
                 return Response(serializer.data, status=status.HTTP_201_CREATED)
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-        return Response(None, status=status.HTTP_401_UNAUTHORIZED)
+        return Response({'error': 'You do not have permission to create products.'},
+                        status=status.HTTP_401_UNAUTHORIZED)
 
-
-@api_view(['GET', 'PATCH', 'DELETE'])
-def product_detail(request, pk):
-    """
-    Retrieve, update or delete a product.
-    """
-    if not request.user.is_staff or not request.user.is_superuser:
-        return Response(status=status.HTTP_401_UNAUTHORIZED)
-
-    try:
-        product = Product.objects.get(pk=pk)
-    except Product.DoesNotExist:
-        return Response(status=status.HTTP_404_NOT_FOUND)
-
-    if request.method == 'GET':
-        serializer = StaffProductSerializer(product, context={'request': request})
-        return Response(serializer.data)
-
-    elif request.method == 'PATCH':
-        serializer = StaffProductSerializer(product, data=request.data, context={'request': request})
-        if serializer.is_valid():
-            serializer.save()
+    def partial_update(self, request, *args, **kwargs):
+        instance = self.get_object()
+        if request.user.is_staff or request.user.is_superuser:
+            serializer = self.get_serializer(instance, data=request.data, partial=kwargs.get('partial', True))
+            serializer.is_valid(raise_exception=True)
+            self.perform_update(serializer)
             return Response(serializer.data)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            return Response({'error': 'You do not have permission to update products.'},
+                            status=status.HTTP_403_FORBIDDEN)
 
-    elif request.method == 'DELETE':
-        product.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
+    def retrieve(self, request, *args, **kwargs):
+        instance = self.get_object()
+        if request.user.is_staff or request.user.is_superuser:
+            serializer = self.get_serializer(instance)
+            return Response(serializer.data)
+        else:
+            return Response({'error': 'You do not have permission to retrieve this product.'},
+                            status=status.HTTP_403_FORBIDDEN)
 
+    def destroy(self, request, *args, **kwargs):
+        instance = self.get_object()
+        if request.user.is_staff or request.user.is_superuser:
+            self.perform_destroy(instance)
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        else:
+            return Response({'error': 'You do not have permission to delete this product.'},
+                            status=status.HTTP_403_FORBIDDEN)

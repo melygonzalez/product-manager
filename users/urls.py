@@ -1,9 +1,11 @@
-from django.urls import path
-from products import views
-from users.views import user_list, user_approval
+from django.urls import path, include
+from rest_framework import routers
+
+from users.views import UserViewSet
+
+router = routers.DefaultRouter()
+router.register(r'users', UserViewSet)
 
 urlpatterns = [
-    path('', user_list),
-    path('<int:pk>/', views.product_detail),
-    path('<int:pk>/approve', user_approval),
+    path('', include(router.urls)),
 ]

@@ -131,7 +131,7 @@
 							}
 						],
 						"url": {
-							"raw": "127.0.0.1:8000/users/{id}/approve",
+							"raw": "127.0.0.1:8000/users/6/approve/",
 							"host": [
 								"127",
 								"0",
@@ -141,8 +141,9 @@
 							"port": "8000",
 							"path": [
 								"users",
-								"{id}",
-								"approve"
+								"6",
+								"approve",
+								""
 							]
 						}
 					},
@@ -277,7 +278,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"id\": {id},\n    \"categories\": [\n        {\n            \"id\": 6,\n            \"name\": \"Fruit\"\n        },\n        {\n            \"name\": \"Tropical\"\n        }\n    ],\n    \"images\": [\n        {\n            \"image\": \"https://example.com/image1.jpg\"\n        }\n    ],\n    \"name\": \"Cherry\",\n    \"status\": \"IN\"\n}",
+							"raw": "{\n    \"id\": {id},\n    \"categories\": [\n        {\n            \"name\": \"Fruit\"\n        },\n        {\n            \"name\": \"Tropical\"\n        }\n    ],\n    \"images\": [\n        {\n            \"image\": \"https://example.com/image1.jpg\"\n        }\n    ],\n    \"name\": \"Cherry\",\n    \"status\": \"IN\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
